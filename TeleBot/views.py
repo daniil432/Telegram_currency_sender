@@ -1,0 +1,100 @@
+from django.http import HttpResponse
+import telebot
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+
+def TeleBotPage(request):
+    TeleBotTest(request)
+    return HttpResponse('<h>BOTAPP</h>')
+
+
+def TeleBotTest(request):
+    bot = telebot.TeleBot('5275070623:AAFx6eA6usYCq2DBCifGWtEru2DuYCUAwQI', parse_mode=None)
+
+    @bot.message_handler(commands=['start'])
+    def start_message(message):
+        bot.send_message(message.chat.id, 'Hello, i am a new telegram bot.\n'
+                                          'Print /A in the chat to see current exchange rate.\n'
+                                          'If you want to receive messages about changes in exchange rate print /B\n'
+                                          'If you dont want to receive messages about changes in exchange rate print /C')
+        from TeleBot.models import TelebotUsers
+        new_user = message.chat.id
+        user_db = TelebotUsers()
+        check_number = 0
+        for i in range(len(list(TelebotUsers.objects.values('username')))):
+            if str(new_user) != list(TelebotUsers.objects.values('username'))[i]['username']:
+                pass
+            else:
+                check_number += 1
+        if check_number == 0:
+            user_db.username = new_user
+            user_db.join_date = datetime.now().replace(second=0, microsecond=0)
+            user_db.sending_status = False
+            user_db.save()
+        else:
+            pass
+
+    @bot.message_handler(commands=['A'])
+    def current_exchange(message):
+        bot.send_message(message.chat.id, f'Current Dollar Exchange Rate is: {Currency().get_currency_price()[0]},\n'
+                                          f'Current Euro Exchange Rate is: {Currency().get_currency_price()[1]}')
+
+    @bot.message_handler(commands=['B'])
+    def change_sending_status(message):
+        from TeleBot.models import TelebotUsers
+        TelebotUsers.objects.filter(username=message.chat.id).update(sending_status=True)
+        bot.send_message(message.chat.id, 'Now you will receive messages about changes in exchange rate')
+
+    @bot.message_handler(commands=['C'])
+    def change_sending_status(message):
+        from TeleBot.models import TelebotUsers
+        TelebotUsers.objects.filter(username=message.chat.id).update(sending_status=False)
+        bot.send_message(message.chat.id, 'Now you wont receive messages about changes in exchange rate')
+
+    bot.polling(none_stop=True, interval=0)
+    return request
+
+
+class Currency(object):
+    DOLLAR_RUB = 'https://www.google.com/search?sxsrf=ALeKk01NWm6viYijAo3HXYOEQUyDEDtFEw%3A1584716087546&source=hp&ei=N9l0XtDXHs716QTcuaXoAg&q=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+%D0%BA+%D1%80%D1%83%D0%B1%D0%BB%D1%8E&oq=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+&gs_l=psy-ab.3.0.35i39i70i258j0i131l4j0j0i131l4.3044.4178..5294...1.0..0.83.544.7......0....1..gws-wiz.......35i39.5QL6Ev1Kfk4'
+    EURO_RUB = 'https://www.google.com/search?q=tdhj+к+рублю&ei=q0M2YuPCMK6qrgSN2YzwBQ&ved=0ahUKEwijxNCQiNP2AhUulYsKHY0sA14Q4dUDCA0&uact=5&oq=tdhj+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyCggAELEDEIMBEEMyBAgAEAoyBAgAEAoyBAgAEAoyCggAELEDEIMBEAoyBAgAEAoyBAgAEAoyBAgAEAoyBAgAEAoyBAgAEAo6BggAEAcQHjoICAAQBxAKEB46CggAEAcQChAeECo6BAgAEA1KBAhBGABKBAhGGABQAFiDBGC9BmgAcAF4AIABPYgB6gGSAQE0mAEAoAEBwAEB&sclient=gws-wiz'
+    "Заголовки для передачи вместе с URL"
+    YEN_RUB = 'https://www.google.com/search?client=opera&q=qtys+d+he%2Ckb&sourceid=opera&ie=UTF-8&oe=UTF-8'
+    YUAN_RUB ='https://www.google.com/search?q=.fym+в+рубли&client=opera&hs=Lcq&ei=mOw9YvLPGoWyrgTvmrKoBw&ved=0ahUKEwjy-6Ob1uH2AhUFmYsKHW-NDHUQ4dUDCA0&uact=5&oq=.fym+в+рубли&gs_lcp=Cgdnd3Mtd2l6EAMyDAgAELEDEIMBEAoQKjIECAAQCjIECAAQCjoGCAAQBxAeOggIABAHEAoQHjoKCAAQBxAFEAoQHjoICAAQChABECpKBAhBGABKBAhGGABQAFjZB2DqCWgAcAF4AIABYYgB_wKSAQE0mAEAoAEBwAEB&sclient=gws-wiz'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
+    current_converted_price_dollar = 0
+    current_converted_price_euro = 0
+    difference = 5
+
+    def __init__(self):
+        self.current_converted_price_dollar = float(self.get_currency_price()[0].replace(",", "."))
+        self.current_converted_price_euro = float(self.get_currency_price()[1].replace(",", "."))
+
+    def get_currency_price(self):
+        "Парсим всю страницу"
+        full_page_dollar = requests.get(self.DOLLAR_RUB, headers=self.headers)
+        full_page_euro = requests.get(self.EURO_RUB, headers=self.headers)
+        "Разбираем через BeautifulSoup"
+        soup_dollar = BeautifulSoup(full_page_dollar.content, 'html.parser')
+        soup_euro = BeautifulSoup(full_page_euro.content, 'html.parser')
+        "Получаем нужное для нас значение и возвращаем его"
+        convert_dollar = soup_dollar.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
+        convert_euro = soup_euro.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
+        return convert_dollar[0].text, convert_euro[0].text
+
+
+    "Проверка изменения валюты"
+    def check_currency(self):
+        currency_dollar = float(self.get_currency_price()[0].replace(",", "."))
+        if currency_dollar >= self.current_converted_price_dollar + self.difference:
+            print("Курс сильно вырос, может пора что-то делать?")
+        elif currency_dollar <= self.current_converted_price_dollar - self.difference:
+            print("Курс сильно упал, может пора что-то делать?")
+        print("Сейчас курс: 1 доллар = " + str(currency_dollar))
+        return str(currency_dollar)
+
+
+
