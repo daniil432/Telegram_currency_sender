@@ -1,3 +1,5 @@
+import time
+
 from django.http import HttpResponse
 import telebot
 import requests
@@ -104,42 +106,29 @@ def TeleBotTest(request):
 
 class Currency(object):
     DOLLAR_RUB = 'https://www.google.com/search?sxsrf=ALeKk01NWm6viYijAo3HXYOEQUyDEDtFEw%3A1584716087546&source=hp&ei=N9l0XtDXHs716QTcuaXoAg&q=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+%D0%BA+%D1%80%D1%83%D0%B1%D0%BB%D1%8E&oq=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+&gs_l=psy-ab.3.0.35i39i70i258j0i131l4j0j0i131l4.3044.4178..5294...1.0..0.83.544.7......0....1..gws-wiz.......35i39.5QL6Ev1Kfk4'
-    EURO_RUB = 'https://www.google.com/search?q=tdhj+к+рублю&ei=q0M2YuPCMK6qrgSN2YzwBQ&ved=0ahUKEwijxNCQiNP2AhUulYsKHY0sA14Q4dUDCA0&uact=5&oq=tdhj+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyCggAELEDEIMBEEMyBAgAEAoyBAgAEAoyBAgAEAoyCggAELEDEIMBEAoyBAgAEAoyBAgAEAoyBAgAEAoyBAgAEAoyBAgAEAo6BggAEAcQHjoICAAQBxAKEB46CggAEAcQChAeECo6BAgAEA1KBAhBGABKBAhGGABQAFiDBGC9BmgAcAF4AIABPYgB6gGSAQE0mAEAoAEBwAEB&sclient=gws-wiz'
+    EURO_RUB = 'https://www.google.com/search?q=евро+к+рублю&ei=P4s-YpiCL6GSxc8Pm8CIgAo&ved=0ahUKEwjYnZfC7eL2AhUhSfEDHRsgAqAQ4dUDCA0&uact=5&oq=евро+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyDwgAELEDEIMBEEMQRhCCAjIFCAAQgAQyBQgAEIAEMgsIABCABBCxAxCDATIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDoGCAAQBxAeOggIABAHEAoQHjoECAAQDUoECEEYAEoECEYYAFAAWKwOYIQRaABwAXgAgAFoiAGPBJIBAzUuMZgBAKABAcABAQ&sclient=gws-wiz'
     "Заголовки для передачи вместе с URL"
-    YEN_RUB = 'https://www.google.com/search?client=opera&q=qtys+d+he%2Ckb&sourceid=opera&ie=UTF-8&oe=UTF-8'
-    YUAN_RUB ='https://www.google.com/search?q=.fym+в+рубли&client=opera&hs=Lcq&ei=mOw9YvLPGoWyrgTvmrKoBw&ved=0ahUKEwjy-6Ob1uH2AhUFmYsKHW-NDHUQ4dUDCA0&uact=5&oq=.fym+в+рубли&gs_lcp=Cgdnd3Mtd2l6EAMyDAgAELEDEIMBEAoQKjIECAAQCjIECAAQCjoGCAAQBxAeOggIABAHEAoQHjoKCAAQBxAFEAoQHjoICAAQChABECpKBAhBGABKBAhGGABQAFjZB2DqCWgAcAF4AIABYYgB_wKSAQE0mAEAoAEBwAEB&sclient=gws-wiz'
+    YEN_RUB = 'https://www.google.com/search?q=йена+к+рублю&ei=RYs-YrSLCN2Oxc8P99G9mAY&ved=0ahUKEwj0wd7E7eL2AhVdR_EDHfdoD2MQ4dUDCA0&uact=5&oq=йена+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyEAgAEIAEELEDEIMBEEYQggIyBQgAEIAEMgQIABBDMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgQIABAeOgcIABBHELADOgoIABBHELADEMkDOggIABCSAxCwAzoHCAAQsAMQQzoGCAAQBxAeOgQIABANOgkIABANEEYQggI6BAgAEAo6CwgAEIAEELEDEIMBOg8IABCxAxCDARAKEEYQggI6CAgAEAcQChAeSgQIQRgASgQIRhgAUOAOWNQ3YPg4aAFwAXgAgAHlAYgBvAaSAQU3LjAuMZgBAKABAcgBCsABAQ&sclient=gws-wiz'
+    YUAN_RUB ='https://www.google.com/search?q=юань+к+рублю&ei=XYs-YrK8G6uPxc8Pn7CAyAk&ved=0ahUKEwjy3qrQ7eL2AhWrR_EDHR8YAJkQ4dUDCA0&uact=5&oq=юань+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyEAgAEIAEELEDEIMBEEYQggIyBQgAEIAEMgQIABBDMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDoGCAAQBxAeSgQIQRgASgQIRhgAUABYugdglAxoAHABeACAAWKIAfECkgEBNJgBAKABAcABAQ&sclient=gws-wiz'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
-    current_converted_price_dollar = 0
-    current_converted_price_euro = 0
-    difference = 5
-
-    def __init__(self):
-        self.current_converted_price_dollar = float(self.get_currency_price()[0].replace(",", "."))
-        self.current_converted_price_euro = float(self.get_currency_price()[1].replace(",", "."))
 
     def get_currency_price(self):
         "Парсим всю страницу"
         full_page_dollar = requests.get(self.DOLLAR_RUB, headers=self.headers)
         full_page_euro = requests.get(self.EURO_RUB, headers=self.headers)
+        full_page_yen = requests.get(self.YEN_RUB, headers=self.headers)
+        full_page_yuan = requests.get(self.YUAN_RUB, headers=self.headers)
         "Разбираем через BeautifulSoup"
         soup_dollar = BeautifulSoup(full_page_dollar.content, 'html.parser')
         soup_euro = BeautifulSoup(full_page_euro.content, 'html.parser')
+        soup_yen = BeautifulSoup(full_page_yen.content, 'html.parser')
+        soup_yuan = BeautifulSoup(full_page_yuan.content, 'html.parser')
         "Получаем нужное для нас значение и возвращаем его"
         convert_dollar = soup_dollar.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
         convert_euro = soup_euro.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
-        return convert_dollar[0].text, convert_euro[0].text
-
-
-    "Проверка изменения валюты"
-    def check_currency(self):
-        currency_dollar = float(self.get_currency_price()[0].replace(",", "."))
-        if currency_dollar >= self.current_converted_price_dollar + self.difference:
-            print("Курс сильно вырос, может пора что-то делать?")
-        elif currency_dollar <= self.current_converted_price_dollar - self.difference:
-            print("Курс сильно упал, может пора что-то делать?")
-        print("Сейчас курс: 1 доллар = " + str(currency_dollar))
-        return str(currency_dollar)
-
+        convert_yen = soup_yen.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
+        convert_yuan = soup_yuan.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
+        return convert_dollar[0].text, convert_euro[0].text, convert_yen[0].text, convert_yuan[0].text
 
 
