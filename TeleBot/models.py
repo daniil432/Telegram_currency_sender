@@ -5,6 +5,8 @@ from django.urls import reverse
 class ExchangeData(models.Model):
     dollar_rate = models.FloatField(max_length=10, help_text="Dollar exchange rate")
     euro_rate = models.FloatField(max_length=10, help_text="Euro exchange rate")
+    yen_rate = models.FloatField(max_length=10, help_text="Yen exchange rate")
+    yuan_rate = models.FloatField(max_length=10, help_text="Yuan exchange rate")
     time_rate = models.DateTimeField(help_text="Time when rate was obtained")
 
     def get_absolute_url(self):
@@ -14,7 +16,7 @@ class ExchangeData(models.Model):
         return self.time_rate
 
     def __float__(self):
-        return self.dollar_rate, self.euro_rate
+        return self.dollar_rate, self.euro_rate, self.yen_rate, self.yuan_rate
 
 
 class TelebotUsers(models.Model):
@@ -30,7 +32,10 @@ class TelebotUsers(models.Model):
         return self.join_date
 
     def __str__(self):
-        return self.username
+        return self.username, self.user_currency
 
     def __bool__(self):
         return self.sending_status
+
+    def __int__(self):
+        return self.percent_user
