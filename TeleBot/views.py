@@ -1,11 +1,8 @@
-import time
-
 from django.http import HttpResponse
 import telebot
-import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+from ExchangeRate.messages import Currency
 
 
 def TeleBotPage(request):
@@ -23,7 +20,7 @@ def TeleBotTest(request):
                                           'If you want to receive messages about changes in exchange rate print /B\n'
                                           'If you dont want to receive messages about changes in exchange rate print /C\n'
                                           'You can select currency that will be tracked for you (default: dollars).'
-                                          'Print /add_ + (currency that you want to check) or /del_ + '
+                                          'Print /add_+(currency that you want to check) or /del_+'
                                           '(currency that you dont want to check). Available options: '
                                           'dollar, euro, yen, yuan')
         from TeleBot.models import TelebotUsers
@@ -74,10 +71,10 @@ def TeleBotTest(request):
             correct_currency = correct_currency.replace(' ', '')
         try:
             test = re.search(correct_currency, before)[0]
-            bot.send_message(message.chat.id, f'You are already tracking {correct_currency}')
+            bot.send_message(message.chat.id, f'You are already tracking {correct_currency.replace("_", " ")}')
         except:
             TelebotUsers.objects.filter(username=message.chat.id).update(user_currency=before + ',' + correct_currency)
-            bot.send_message(message.chat.id, f'Now you will receive messages about changes in {correct_currency}')
+            bot.send_message(message.chat.id, f'Now you will receive messages about changes in {correct_currency.replace("_", " ")}')
 
     @bot.message_handler(
         commands=['del_dollar', 'del_dollars', 'del_euro', 'del_euros', 'del_yen', 'del_yens', 'del_yuan', 'del_yuans'])
@@ -96,39 +93,9 @@ def TeleBotTest(request):
             test = re.search(correct_currency, before)[0]
             new_currency = before.replace(f',{correct_currency}', '')
             TelebotUsers.objects.filter(username=message.chat.id).update(user_currency=new_currency)
-            bot.send_message(message.chat.id, f'You wont track {correct_currency} anymore.')
+            bot.send_message(message.chat.id, f'You wont track {correct_currency.replace("_", " ")} anymore.')
         except:
-            bot.send_message(message.chat.id, f'You havent tracked {correct_currency} anyway.')
+            bot.send_message(message.chat.id, f'You havent tracked {correct_currency.replace("_", " ")} anyway.')
 
     bot.polling(none_stop=True, interval=0)
-    return request
-
-
-class Currency(object):
-    DOLLAR_RUB = 'https://www.google.com/search?sxsrf=ALeKk01NWm6viYijAo3HXYOEQUyDEDtFEw%3A1584716087546&source=hp&ei=N9l0XtDXHs716QTcuaXoAg&q=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+%D0%BA+%D1%80%D1%83%D0%B1%D0%BB%D1%8E&oq=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80+&gs_l=psy-ab.3.0.35i39i70i258j0i131l4j0j0i131l4.3044.4178..5294...1.0..0.83.544.7......0....1..gws-wiz.......35i39.5QL6Ev1Kfk4'
-    EURO_RUB = 'https://www.google.com/search?q=евро+к+рублю&ei=P4s-YpiCL6GSxc8Pm8CIgAo&ved=0ahUKEwjYnZfC7eL2AhUhSfEDHRsgAqAQ4dUDCA0&uact=5&oq=евро+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyDwgAELEDEIMBEEMQRhCCAjIFCAAQgAQyBQgAEIAEMgsIABCABBCxAxCDATIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDoGCAAQBxAeOggIABAHEAoQHjoECAAQDUoECEEYAEoECEYYAFAAWKwOYIQRaABwAXgAgAFoiAGPBJIBAzUuMZgBAKABAcABAQ&sclient=gws-wiz'
-    "Заголовки для передачи вместе с URL"
-    YEN_RUB = 'https://www.google.com/search?q=йена+к+рублю&ei=RYs-YrSLCN2Oxc8P99G9mAY&ved=0ahUKEwj0wd7E7eL2AhVdR_EDHfdoD2MQ4dUDCA0&uact=5&oq=йена+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyEAgAEIAEELEDEIMBEEYQggIyBQgAEIAEMgQIABBDMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgQIABAeOgcIABBHELADOgoIABBHELADEMkDOggIABCSAxCwAzoHCAAQsAMQQzoGCAAQBxAeOgQIABANOgkIABANEEYQggI6BAgAEAo6CwgAEIAEELEDEIMBOg8IABCxAxCDARAKEEYQggI6CAgAEAcQChAeSgQIQRgASgQIRhgAUOAOWNQ3YPg4aAFwAXgAgAHlAYgBvAaSAQU3LjAuMZgBAKABAcgBCsABAQ&sclient=gws-wiz'
-    YUAN_RUB ='https://www.google.com/search?q=юань+к+рублю&ei=XYs-YrK8G6uPxc8Pn7CAyAk&ved=0ahUKEwjy3qrQ7eL2AhWrR_EDHR8YAJkQ4dUDCA0&uact=5&oq=юань+к+рублю&gs_lcp=Cgdnd3Mtd2l6EAMyEAgAEIAEELEDEIMBEEYQggIyBQgAEIAEMgQIABBDMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBQgAEIAEMgUIABCABDoGCAAQBxAeSgQIQRgASgQIRhgAUABYugdglAxoAHABeACAAWKIAfECkgEBNJgBAKABAcABAQ&sclient=gws-wiz'
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}
-
-    def get_currency_price(self):
-        "Парсим всю страницу"
-        full_page_dollar = requests.get(self.DOLLAR_RUB, headers=self.headers)
-        full_page_euro = requests.get(self.EURO_RUB, headers=self.headers)
-        full_page_yen = requests.get(self.YEN_RUB, headers=self.headers)
-        full_page_yuan = requests.get(self.YUAN_RUB, headers=self.headers)
-        "Разбираем через BeautifulSoup"
-        soup_dollar = BeautifulSoup(full_page_dollar.content, 'html.parser')
-        soup_euro = BeautifulSoup(full_page_euro.content, 'html.parser')
-        soup_yen = BeautifulSoup(full_page_yen.content, 'html.parser')
-        soup_yuan = BeautifulSoup(full_page_yuan.content, 'html.parser')
-        "Получаем нужное для нас значение и возвращаем его"
-        convert_dollar = soup_dollar.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
-        convert_euro = soup_euro.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
-        convert_yen = soup_yen.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
-        convert_yuan = soup_yuan.findAll("span", {"class": "DFlfde", "class": "SwHCTb", "data-precision": 2})
-        return convert_dollar[0].text, convert_euro[0].text, convert_yen[0].text, convert_yuan[0].text
-
-
+    return HttpResponse('<h>BOT CLOSED</h>')

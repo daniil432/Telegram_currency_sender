@@ -1,7 +1,7 @@
 import os
 from celery import Celery
 from celery.schedules import crontab
-from TeleBot.views import Currency
+from ExchangeRate.messages import Currency
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'TelegramApp.settings')
 
