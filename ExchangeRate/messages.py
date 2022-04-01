@@ -51,7 +51,6 @@ class CreateMessage(object):
                 f'{datetime.now().replace(second=0, microsecond=0) - data_delta}',
                 f'{datetime.now().replace(second=0, microsecond=0)}')).order_by(f'{currency}').values('id', f'{currency}',
                                                                                                       'time_rate'))[0]
-            print(max_value, min_value)
 
             if ((self.current_dict[currency] / max_value[currency]) * 100 - 100 <= -self.percent) and (
                     (self.current_dict[currency] / min_value[currency]) * 100 - 100 >= self.percent):
@@ -59,24 +58,24 @@ class CreateMessage(object):
                     final_message = final_message + str(f'Курс рубля к {text_templates[currency]} вырос больше чем на {self.percent}% '
                           f'по сравнению с курсом на {max_value["time_rate"].replace(tzinfo=None)},'
                           f' рубль вырос на {abs(round(((self.current_dict[currency] / max_value[currency]) * 100 - 100), 3))}%, '
-                          f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n')
+                          f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n\n')
                 elif max_value['id'] >= min_value['id']:
                     final_message = final_message + str(f'Курс рубля к {text_templates[currency]} упал больше чем на {self.percent}% '
                           f'по сравнению с курсом на {min_value["time_rate"].replace(tzinfo=None)},'
                           f' рубль упал на {round(((self.current_dict[currency] / min_value[currency]) * 100 - 100), 3)}%, '
-                          f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n')
+                          f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n\n')
             elif ((self.current_dict[currency] / max_value[currency]) * 100 - 100 <= -self.percent) \
                     and ((self.current_dict[currency] / min_value[currency]) * 100 - 100 < self.percent):
                 final_message = final_message + str(f'Курс рубля к {text_templates[currency]} вырос больше чем на {self.percent}% '
                       f'по сравнению с курсом на {max_value["time_rate"].replace(tzinfo=None)}, '
                       f'рубль вырос на {abs(round(((self.current_dict[currency] / max_value[currency]) * 100 - 100), 3))}%, '
-                      f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n')
+                      f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n\n')
             elif ((self.current_dict[currency] / max_value[currency]) * 100 - 100 > -self.percent) and (
                     (self.current_dict[currency] / min_value[currency]) * 100 - 100 >= self.percent):
                 final_message = final_message + str(f'Курс рубля к {text_templates[currency]} упал больше чем на {self.percent}% '
                       f'по сравнению с курсом на {min_value["time_rate"].replace(tzinfo=None)}, '
                       f'рубль упал на {round(((self.current_dict[currency] / min_value[currency]) * 100 - 100), 3)}%, '
-                      f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n')
+                      f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n\n')
             else:
                 pass
         return final_message

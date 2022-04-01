@@ -14,7 +14,6 @@ def create_record(dollar_rate, euro_rate, yen_rate, yuan_rate):
     data.yen_rate = yen_rate
     data.yuan_rate = yuan_rate
     data.time_rate = datetime.now().replace(second=0, microsecond=0)
-    print('Success')
     # Сохраняем запись
     data.save()
 
