@@ -11,7 +11,6 @@ def create_plot(currency, start_date):
         f'{start_date}',
         f'{datetime.now().replace(second=0, microsecond=0)}')).values_list(f'{currency}', flat=True))
 
-    print(x, "\n", y)
     fig = plt.figure(figsize=(7, 5), dpi=100)
     fig.patch.set_facecolor('xkcd:mint green')
     ax = fig.add_subplot(111)

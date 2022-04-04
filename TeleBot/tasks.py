@@ -5,6 +5,12 @@ from ExchangeRate import messages
 
 
 @app.task
+def start_bot():
+    from TeleBot.telebot_commands import TeleBot
+    TeleBot()
+
+
+@app.task
 def create_record(dollar_rate, euro_rate, yen_rate, yuan_rate):
     # Создаем записи в базу данных о текущем курсе доллара и евро, а также времени создания записи
     from TeleBot.models import ExchangeData

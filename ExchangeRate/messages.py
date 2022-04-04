@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -40,7 +40,7 @@ class CreateMessage(object):
         self.percent = percent
 
     def message_assembler(self):
-        data_delta = datetime.now() - datetime(year=2022, month=3, day=22, hour=9, minute=3, second=0)
+        data_delta = timedelta(days=7)
         text_templates = {"dollar_rate": "доллару", "euro_rate": "евро", "yen_rate": "йене", "yuan_rate": "юаню"}
         final_message = ''
         from TeleBot.models import ExchangeData
@@ -78,7 +78,7 @@ class CreateMessage(object):
                               f'по сравнению с курсом на {max_value["time_rate"].replace(tzinfo=None).strftime("%Y-%m-%d, %H:%M")},'
                               f' рубль вырос на {abs(round(((self.current_dict[currency] / max_value[currency]) * 100 - 100), 3))}%, '
                               f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n\n')
-                        update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                        UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
 
                     elif max_value['id'] >= min_value['id']:
                         final_message = final_message + str(f'Курс рубля к {text_templates[currency]} упал больше чем на {self.percent}% '
@@ -86,7 +86,7 @@ class CreateMessage(object):
                               f' рубль упал на {round(((self.current_dict[currency] / min_value[currency]) * 100 - 100), 3)}%, '
                               f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n\n')
 
-                        update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                        UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
 
                 elif ((self.current_dict[currency] / max_value[currency]) * 100 - 100 <= -self.percent) \
                         and ((self.current_dict[currency] / min_value[currency]) * 100 - 100 < self.percent):
@@ -95,7 +95,7 @@ class CreateMessage(object):
                           f'рубль вырос на {abs(round(((self.current_dict[currency] / max_value[currency]) * 100 - 100), 3))}%, '
                           f'значение курса изменилось с {max_value[currency]} до {self.current_dict[currency]}\n\n')
 
-                    update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                    UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
 
                 elif ((self.current_dict[currency] / max_value[currency]) * 100 - 100 > -self.percent) and (
                         (self.current_dict[currency] / min_value[currency]) * 100 - 100 >= self.percent):
@@ -104,7 +104,7 @@ class CreateMessage(object):
                           f'рубль упал на {round(((self.current_dict[currency] / min_value[currency]) * 100 - 100), 3)}%, '
                           f'значение курса изменилось с {min_value[currency]} до {self.current_dict[currency]}\n\n')
 
-                    update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                    UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
                 else:
                     pass
             else:
@@ -117,7 +117,7 @@ class CreateMessage(object):
                                                         f'{abs(round(((self.current_dict[currency] / prev_curr) * 100 - 100), 3))}%, '
                                                         f'значение курса изменилось с {prev_curr} '
                                                         f'до {self.current_dict[currency]}\n\n')
-                    update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                    UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
 
                 elif ((self.current_dict[currency] / prev_curr) * 100 - 100) >= self.percent:
                     final_message = final_message + str(f'Курс рубля к {text_templates[currency]} упал больше чем на '
@@ -127,7 +127,7 @@ class CreateMessage(object):
                                                         f'{round(((self.current_dict[currency] / prev_curr) * 100 - 100), 3)}%, '
                                                         f'значение курса изменилось с {prev_curr} '
                                                         f'до {self.current_dict[currency]}\n\n')
-                    update = UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
+                    UserPreviousMessages.objects.filter(user_id=self.user_id).update(**attribute_dict)
 
                 else:
                     pass
