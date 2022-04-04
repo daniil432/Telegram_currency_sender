@@ -22,12 +22,15 @@ def create_record(dollar_rate, euro_rate, yen_rate, yuan_rate):
 def check_rate(dollar_rate, euro_rate, yen_rate, yuan_rate):
     from TeleBot.models import TelebotUsers
     bot = telebot.TeleBot('5275070623:AAFx6eA6usYCq2DBCifGWtEru2DuYCUAwQI', parse_mode=None)
-    user_data = list(TelebotUsers.objects.values('username', 'sending_status', 'percent_user', 'user_currency'))
+    user_data = list(TelebotUsers.objects.values('id', 'username', 'sending_status', 'percent_user', 'user_currency'))
     current_dict = {"dollar_rate": dollar_rate, "euro_rate": euro_rate, "yen_rate": yen_rate, "yuan_rate": yuan_rate}
 
     for ind in range(len(user_data)):
         if user_data[ind]['sending_status'] is True:
             user_currency = user_data[ind]['user_currency'].split(",")
             percent = user_data[ind]["percent_user"]
-            final_message = messages.CreateMessage(current_dict, user_currency, percent).message_assembler()
-            bot.send_message(user_data[ind]['username'], final_message)
+            final_message = messages.CreateMessage(user_data[ind]['id'], current_dict, user_currency, percent).message_assembler()
+            if final_message == '':
+                pass
+            else:
+                bot.send_message(user_data[ind]['username'], final_message)

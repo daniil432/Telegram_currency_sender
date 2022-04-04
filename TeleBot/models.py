@@ -39,3 +39,21 @@ class TelebotUsers(models.Model):
 
     def __int__(self):
         return self.percent_user
+
+
+class UserPreviousMessages(models.Model):
+    user = models.OneToOneField(TelebotUsers, on_delete=models.CASCADE, primary_key=True,)
+    dollar_prev = models.FloatField(max_length=10, help_text="Dollar rate that previously was sent to user")
+    euro_prev = models.FloatField(max_length=10, help_text="Euro rate that previously was sent to user")
+    yen_prev = models.FloatField(max_length=10, help_text="Yen rate that previously was sent to user")
+    yuan_prev = models.FloatField(max_length=10, help_text="Yuan rate that previously was sent to user")
+    time_dollar = models.DateTimeField(help_text="Time when dollar was recorded")
+    time_euro = models.DateTimeField(help_text="Time when euro was recorded")
+    time_yen = models.DateTimeField(help_text="Time when yen was recorded")
+    time_yuan = models.DateTimeField(help_text="Time when yuan was recorded")
+
+    def __float__(self):
+        return self.dollar_prev, self.euro_prev, self.yen_prev, self.yuan_prev
+
+    def __datetime__(self):
+        return self.time_dollar, self.time_euro, self.time_yen, self.time_yuan
