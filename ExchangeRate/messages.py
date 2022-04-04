@@ -50,9 +50,9 @@ class CreateMessage(object):
             time_prev = 'time_' + re.findall('(\w+)_', currency)[0]
             attribute_dict = {prev_req: self.current_dict[currency],
                               time_prev: datetime.now().replace(second=0, microsecond=0)}
-            test = UserPreviousMessages.objects.filter(user_id=self.user_id).values(prev_req)
+            check_if_exist = UserPreviousMessages.objects.filter(user_id=self.user_id).values(prev_req)
 
-            if list(test) == []:
+            if list(check_if_exist) == []:
                 record = UserPreviousMessages(user_id=self.user_id, dollar_prev=0, euro_prev=0, yen_prev=0, yuan_prev=0,
                                               time_dollar=datetime.now().replace(second=0, microsecond=0, tzinfo=None),
                                               time_euro=datetime.now().replace(second=0, microsecond=0, tzinfo=None),
@@ -62,7 +62,7 @@ class CreateMessage(object):
             else:
                 pass
 
-            if list(test)[0][prev_req] == 0:
+            if list(check_if_exist)[0][prev_req] == 0:
                 max_value = list(ExchangeData.objects.filter(time_rate__range=(
                     f'{datetime.now().replace(second=0, microsecond=0) - data_delta}',
                     f'{datetime.now().replace(second=0, microsecond=0)}')).order_by(f'-{currency}').values('id', f'{currency}', 'time_rate'))[0]

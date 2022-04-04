@@ -57,3 +57,15 @@ class UserPreviousMessages(models.Model):
 
     def __datetime__(self):
         return self.time_dollar, self.time_euro, self.time_yen, self.time_yuan
+
+
+class UserFeedback(models.Model):
+    user = models.OneToOneField(TelebotUsers, on_delete=models.CASCADE, primary_key=True,)
+    feedback = models.TextField(help_text="User's feedback")
+    feedback_send_time = models.DateTimeField(help_text="Time when feedback was recorded")
+
+    def __str__(self):
+        return self.feedback
+
+    def __datetime__(self):
+        return self.feedback_send_time
