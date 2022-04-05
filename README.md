@@ -9,3 +9,4 @@ py manage.py shell
 from TeleBot.telebot_commands import TeleBot
 TeleBot()
 Ссылка на моего зарегестрированного бота: t.me/ExchangeRateBot_bot
+Необходимые для работы пакеты находятся в requirements.txt
