@@ -6,9 +6,7 @@
 - Python версии 3.x
 - Установка пакетов, перечисленных в requirements.txt
 - зарегестрировать своего бота в telegram через BotFather
-- Установить Redis
--- Для пользователей Windows это более младшие версии https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504
--- Либо неоффициальные порты https://www.nuget.org/packages/MemuraiDeveloper/ или https://github.com/zkteco-home/redis-windows
+- Установить Redis. Для пользователей Windows это более младшие версии https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504 . Либо неоффициальные порты https://www.nuget.org/packages/MemuraiDeveloper/ или https://github.com/zkteco-home/redis-windows
 
 ## Как использовать
 Для начала работы запускаем сам Django-сервер ```manage.py runserver```.
