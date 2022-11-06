@@ -11,12 +11,12 @@
 ## Как использовать
 Для начала работы запускаем сам Django-сервер ```manage.py runserver```.
 Для запуска периодических задач по отслеживанию курса в терминале вводим:
-```celery -A TelegramApp beat -l INFO``` 
+```celery -A TelegramApp beat -l INFO``` .
 Для запуска обработчика периодических задач и отправщика сообщений в другом терминале вводим:
-```celery -A TelegramApp worker -l INFO -P gevent```
+```celery -A TelegramApp worker -l INFO -P gevent```.
 Для запуска бота в ещё одном терминале вводим:
-```py manage.py shell```
-```from TeleBot.telebot_commands import TeleBot```
-```TeleBot()```
+```py manage.py shell```,
+```from TeleBot.telebot_commands import TeleBot```,
+```TeleBot()```.
 Бот теперь способен воспринимать команды пользователя и через django может обращаться к БД.
 Ссылка на моего зарегестрированного бота: t.me/ExchangeRateBot_bot
